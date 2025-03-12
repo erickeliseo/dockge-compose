@@ -22,6 +22,7 @@ services:
       - ./traefik.yml:/etc/traefik/traefik.yml # Montar archivo de configuración estática
   appdotnet1:
     image: appdotnet1:v1
+    container_name: appdotnet1
     labels:
       - traefik.enable=true
       - traefik.http.routers.appdotnet1.rule=Host(`appdotnet1.example.com`)
@@ -30,6 +31,7 @@ services:
       - traefik.http.services.appdotnet1.loadbalancer.server.port=8080
   appdotnet2:
     image: appdotnet2:v1
+    container_name: appdotnet1
     labels:
       - traefik.enable=true
       - traefik.http.routers.appdotnet2.rule=Host(`appdotnet2.example.com`)
@@ -37,6 +39,7 @@ services:
       - traefik.http.routers.appdotnet2.tls=true
       - traefik.http.services.appdotnet2.loadbalancer.server.port=8080
   webserver:
+  container_name: webserver
     restart: unless-stopped
     image: nginx:latest
 networks: {}
