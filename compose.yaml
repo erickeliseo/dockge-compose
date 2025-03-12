@@ -1,0 +1,42 @@
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: always
+    command:
+      - --providers.docker=true
+      - --providers.file.filename=/etc/traefik/traefik.yml
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.traefik.address=:8080
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --accesslog=true
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080 # Dashboard de Traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./dotnet/certs:/etc/traefik/certs # Montar la carpeta de certificados
+      - ./traefik.yml:/etc/traefik/traefik.yml # Montar archivo de configuración estática
+  appdotnet1:
+    image: appdotnet1:v1
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.appdotnet1.rule=Host(`appdotnet1.example.com`)
+      - traefik.http.routers.appdotnet1.entrypoints=websecure
+      - traefik.http.routers.appdotnet1.tls=true
+      - traefik.http.services.appdotnet1.loadbalancer.server.port=8080
+  appdotnet2:
+    image: appdotnet2:v1
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.appdotnet2.rule=Host(`appdotnet2.example.com`)
+      - traefik.http.routers.appdotnet2.entrypoints=websecure
+      - traefik.http.routers.appdotnet2.tls=true
+      - traefik.http.services.appdotnet2.loadbalancer.server.port=8080
+  webserver:
+    restart: unless-stopped
+    image: nginx:latest
+networks: {}
