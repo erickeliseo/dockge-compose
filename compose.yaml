@@ -39,7 +39,7 @@ services:
       - traefik.http.routers.appdotnet2.tls=true
       - traefik.http.services.appdotnet2.loadbalancer.server.port=8080
   webserver:
-  container_name: webserver
+    container_name: webserver
     restart: unless-stopped
     image: nginx:latest
 networks: {}
